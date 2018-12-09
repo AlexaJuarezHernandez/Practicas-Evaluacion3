@@ -1,0 +1,243 @@
+VALORES VIEJOS
+VALORES NUEVOS
+
+insert into empleados(nombre,apellido,apellido_mat,fecha, salario)
+values('Juan','Perez','Jolote','1980-11-12',1000);
+
+Triggers;
+BEFORE INSERT;
+
+CREATE DEFINER=`root`@`localhost` TRIGGER `evaluacion_3`.`empleados_BEFORE_INSERT` BEFORE INSERT ON `empleados` FOR EACH ROW
+BEGIN
+	if new.salario<10000 then
+    #Exception
+    signal sqlstate '45000' set message_text= 'PAGA MAS TACAÑO';
+    end if;
+
+set new.rfc=genera_rfc(new.nombre, new.apellido,new.apellido_mat,new.fecha_nacimiento);
+END
+
+AFTER INSERT
+
+CREATE DEFINER=`root`@`localhost` TRIGGER `evaluacion_3`.`empleados_AFTER_INSERT` AFTER INSERT ON `empleados` FOR EACH ROW
+BEGIN
+	declare total_sal int;
+    select sum(salario) into total_sal
+    from empleados;
+    update salarios
+	set total_salarios = total_sal;
+    
+END
+
+
+
+MySQL Shell 8.0.12
+
+Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type '\help' or '\?' for help; '\quit' to exit.
+
+
+ MySQL  JS > \sql
+Switching to SQL mode... Commands end with ;
+
+ MySQL  SQL > \connect --mysql root@localhost
+Creating a Classic session to 'root@localhost'
+Please provide the password for 'root@localhost': ****
+Save password for 'root@localhost:3306'? [Y]es/[N]o/Ne[v]er (default No): y
+Fetching schema names for autocompletion... Press ^C to stop.
+Your MySQL connection id is 4
+Server version: 5.5.61 MySQL Community Server (GPL)
+No default schema selected; type \use <schema> to set one.
+
+ MySQL  localhost:3306  SQL > show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| nor                |
+| performance_schema |
+| sakila             |
+| test               |
+| world              |
++--------------------+
+7 rows in set (0.0010 sec)
+
+ MySQL  localhost:3306  SQL > use nor;
+Default schema set to `nor`.
+Fetching table and column names from `nor` for auto-completion... Press ^C to stop.
+
+ MySQL  localhost:3306  nor  SQL > use evaluacion_3;
+Default schema set to `evaluacion_3`.
+Fetching table and column names from `evaluacion_3` for auto-completion... Press ^C to stop.
+                                            create table empleados(idempleados int,nombre char(50),apellido char(50),fecha_nacimiento date,salario int);on_3  SQL > create table empleados(idempleados int,nombre char(50),apellido char(50), sa
+Query OK, 0 rows affected (0.0323 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > drop table empleados;
+Query OK, 0 rows affected (0.0211 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > create table empleados(id int primary key auto_increment,nombre char(50),apellido char(50),fecha_nacimiento date,salario int);
+Query OK, 0 rows affected (0.0327 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > drop table empleados;
+Query OK, 0 rows affected (0.0203 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > create table empleados(id int primary key auto_increment,nombre char(50),apellido char(50),fecha_nacimiento date,salario int,rfc varchar(13);
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+
+ MySQL  localhost:3306  evaluacion_3  SQL > create table empleados(id int primary key auto_increment,nombre char(50),apellido char(50),fecha_nacimiento date,salario int,rfc varchar(13));
+Query OK, 0 rows affected (0.0449 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > desc empleados;
++------------------+-------------+------+-----+---------+----------------+
+| Field            | Type        | Null | Key | Default | Extra          |
++------------------+-------------+------+-----+---------+----------------+
+| id               | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nombre           | char(50)    | YES  |     | NULL    |                |
+| apellido         | char(50)    | YES  |     | NULL    |                |
+| fecha_nacimiento | date        | YES  |     | NULL    |                |
+| salario          | int(11)     | YES  |     | NULL    |                |
+| rfc              | varchar(13) | YES  |     | NULL    |                |
++------------------+-------------+------+-----+---------+----------------+
+6 rows in set (0.0225 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > alter table empleados add apellido_mat varchar(50) after apellido;
+Query OK, 0 rows affected (0.1672 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+ MySQL  localhost:3306  evaluacion_3  SQL > desc empleados;
++------------------+-------------+------+-----+---------+----------------+
+| Field            | Type        | Null | Key | Default | Extra          |
++------------------+-------------+------+-----+---------+----------------+
+| id               | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nombre           | char(50)    | YES  |     | NULL    |                |
+| apellido         | char(50)    | YES  |     | NULL    |                |
+| apellido_mat     | varchar(50) | YES  |     | NULL    |                |
+| fecha_nacimiento | date        | YES  |     | NULL    |                |
+| salario          | int(11)     | YES  |     | NULL    |                |
+| rfc              | varchar(13) | YES  |     | NULL    |                |
++------------------+-------------+------+-----+---------+----------------+
+7 rows in set (0.0228 sec)
+                                            insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario)
+                                        ... values('Juan','Perez','Jolote','1980-11-12',1000);,fecha_nacimiento,salario)
+ERROR: 1305 (42000): FUNCTION evaluacion_3.obten_rfc does not exist
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',1000);
+Query OK, 1 row affected (0.0422 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from empleados;
++----+--------+----------+--------------+------------------+---------+------+
+| id | nombre | apellido | apellido_mat | fecha_nacimiento | salario | rfc  |
++----+--------+----------+--------------+------------------+---------+------+
+|  1 | Juan   | Perez    | Jolote       | 1980-11-12       |    1000 | NULL |
++----+--------+----------+--------------+------------------+---------+------+
+1 row in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',1000);
+ERROR: 1644 (45000): PAGA MAS TACA
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',100000);
+Query OK, 1 row affected (0.0281 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from empleados;
++----+--------+----------+--------------+------------------+---------+------+
+| id | nombre | apellido | apellido_mat | fecha_nacimiento | salario | rfc  |
++----+--------+----------+--------------+------------------+---------+------+
+|  1 | Juan   | Perez    | Jolote       | 1980-11-12       |    1000 | NULL |
+|  2 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | NULL |
++----+--------+----------+--------------+------------------+---------+------+
+2 rows in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',100000);
+Query OK, 1 row affected (0.0262 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from empleados;
++----+--------+----------+--------------+------------------+---------+--------------+
+| id | nombre | apellido | apellido_mat | fecha_nacimiento | salario | rfc          |
++----+--------+----------+--------------+------------------+---------+--------------+
+|  1 | Juan   | Perez    | Jolote       | 1980-11-12       |    1000 | NULL         |
+|  2 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | NULL         |
+|  3 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | PeJJ19801112 |
++----+--------+----------+--------------+------------------+---------+--------------+
+3 rows in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',100000);
+Query OK, 1 row affected (0.0290 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from empleados;
++----+--------+----------+--------------+------------------+---------+--------------+
+| id | nombre | apellido | apellido_mat | fecha_nacimiento | salario | rfc          |
++----+--------+----------+--------------+------------------+---------+--------------+
+|  1 | Juan   | Perez    | Jolote       | 1980-11-12       |    1000 | NULL         |
+|  2 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | NULL         |
+|  3 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | PeJJ19801112 |
+|  4 | Juan   | Perez    | Jolote       | 1980-11-12       |  100000 | PEJJ19801112 |
++----+--------+----------+--------------+------------------+---------+--------------+
+4 rows in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > create table salarios(
+                                        ... total_salarios int);
+Query OK, 0 rows affected (0.0350 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select sum(salario) from empleados;
++--------------+
+| sum(salario) |
++--------------+
+|       301000 |
++--------------+
+1 row in set (0.0386 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from salarios;
+Empty set (0.0009 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into salarios values(0);
+Query OK, 1 row affected (0.0296 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from salarios;
++----------------+
+| total_salarios |
++----------------+
+|              0 |
++----------------+
+1 row in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',100000);
+Query OK, 1 row affected (0.0322 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from salarios;
++----------------+
+| total_salarios |
++----------------+
+|         401000 |
++----------------+
+1 row in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',1000);
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from salarios;
++----------------+
+| total_salarios |
++----------------+
+|         401000 |
++----------------+
+1 row in set (0.0002 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',1000);
+
+ MySQL  localhost:3306  evaluacion_3  SQL > insert into empleados(nombre,apellido,apellido_mat,fecha_nacimiento,salario) values('Juan','Perez','Jolote','1980-11-12',10000);
+Query OK, 1 row affected (0.0277 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL > select * from salarios;
++----------------+
+| total_salarios |
++----------------+
+|         411000 |
++----------------+
+1 row in set (0.0003 sec)
+
+ MySQL  localhost:3306  evaluacion_3  SQL >
